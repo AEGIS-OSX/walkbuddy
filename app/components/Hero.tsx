@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { ChangeEvent, CSSProperties, FormEvent } from "react";
+import type { CSSProperties } from "react";
 import { useMemo, useRef, useState } from "react";
 import { ProjectImage } from "@/app/components/ProjectImage";
 
@@ -77,22 +77,22 @@ function getAvailabilityResult(zip: string): AvailabilityResult {
 }
 
 export default function Hero() {
-  const zipInputRef = useRef<HTMLInputElement | null>(null);
-  const [zip, setZip] = useState<string>("");
-  const [zipError, setZipError] = useState<string>("");
-  const [availabilityState, setAvailabilityState] = useState<AvailabilityState>("idle");
-  const [checkedZip, setCheckedZip] = useState<string>("");
-  const [showWaitlist, setShowWaitlist] = useState<boolean>(false);
-  const [waitlistFields, setWaitlistFields] = useState<WaitlistFields>({
+  const zipInputRef = useRef(null as HTMLInputElement | null);
+  const [zip, setZip] = useState("");
+  const [zipError, setZipError] = useState("");
+  const [availabilityState, setAvailabilityState] = useState("idle" as AvailabilityState);
+  const [checkedZip, setCheckedZip] = useState("");
+  const [showWaitlist, setShowWaitlist] = useState(false);
+  const [waitlistFields, setWaitlistFields] = useState({
     email: "",
     name: "",
     zip: "",
-  });
-  const [waitlistError, setWaitlistError] = useState<string>("");
-  const [waitlistSubmitting, setWaitlistSubmitting] = useState<boolean>(false);
-  const [waitlistSuccess, setWaitlistSuccess] = useState<boolean>(false);
+  } as WaitlistFields);
+  const [waitlistError, setWaitlistError] = useState("");
+  const [waitlistSubmitting, setWaitlistSubmitting] = useState(false);
+  const [waitlistSuccess, setWaitlistSuccess] = useState(false);
 
-  const nextTimes = useMemo<string[]>(() => [formatTodayTime("5:30 PM"), formatTodayTime("7:00 PM")], []);
+  const nextTimes = useMemo((): string[] => [formatTodayTime("5:30 PM"), formatTodayTime("7:00 PM")], []);
 
   const runZipCheck = (zipToCheck: string): void => {
     const trimmedZip = zipToCheck.trim();
@@ -131,7 +131,7 @@ export default function Hero() {
     zipInputRef.current?.focus();
   };
 
-  const handleZipChange = (event: ChangeEvent<HTMLInputElement>): void => {
+  const handleZipChange = (event: { target: HTMLInputElement }): void => {
     const nextZip = event.target.value.replace(/\D/g, "").slice(0, 5);
     setZip(nextZip);
     if (zipError && zipPattern.test(nextZip)) {
@@ -139,12 +139,12 @@ export default function Hero() {
     }
   };
 
-  const handleZipSubmit = (event: FormEvent<HTMLFormElement>): void => {
+  const handleZipSubmit = (event: { preventDefault: () => void }): void => {
     event.preventDefault();
     runZipCheck(zip);
   };
 
-  const handleWaitlistChange = (field: keyof WaitlistFields) => (event: ChangeEvent<HTMLInputElement>): void => {
+  const handleWaitlistChange = (field: keyof WaitlistFields) => (event: { target: HTMLInputElement }): void => {
     setWaitlistFields((currentFields: WaitlistFields) => ({
       ...currentFields,
       [field]: field === "zip" ? event.target.value.replace(/\D/g, "").slice(0, 5) : event.target.value,
@@ -155,7 +155,7 @@ export default function Hero() {
     }
   };
 
-  const handleWaitlistSubmit = (event: FormEvent<HTMLFormElement>): void => {
+  const handleWaitlistSubmit = (event: { preventDefault: () => void }): void => {
     event.preventDefault();
 
     if (!emailPattern.test(waitlistFields.email.trim())) {
