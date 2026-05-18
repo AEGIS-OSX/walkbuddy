@@ -33,10 +33,6 @@ const mutedStyle: CSSProperties = {
   color: "var(--color-muted)",
 };
 
-const focusStyle: CSSProperties = {
-  outlineColor: "var(--color-accent)",
-};
-
 const accentButtonStyle: CSSProperties = {
   backgroundColor: "var(--color-accent)",
   borderColor: "var(--color-accent)",
@@ -44,16 +40,9 @@ const accentButtonStyle: CSSProperties = {
   outlineColor: "var(--color-accent)",
 };
 
-const secondaryButtonStyle: CSSProperties = {
-  backgroundColor: "var(--color-bg)",
-  borderColor: "var(--color-border)",
-  color: "var(--color-text)",
-  outlineColor: "var(--color-accent)",
-};
-
 const successChipStyle: CSSProperties = {
-  backgroundColor: "var(--color-primary)",
-  borderColor: "var(--color-primary)",
+  backgroundColor: "var(--color-success)",
+  borderColor: "var(--color-success)",
   color: "var(--color-text)",
 };
 
@@ -63,9 +52,27 @@ const subtleAccentStyle: CSSProperties = {
   color: "var(--color-text)",
 };
 
+const sectionMotion = {
+  hidden: { opacity: 0, y: 40 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut",
+      staggerChildren: 0.08,
+      delayChildren: 0.05,
+    },
+  },
+};
+
 const childMotion = {
   hidden: { opacity: 0, y: 18 },
-  visible: { opacity: 1, y: 0 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: "easeOut" },
+  },
 };
 
 function formatTodayTime(time: string): string {
@@ -180,21 +187,14 @@ export default function Hero() {
       aria-labelledby="hero-title"
       className="w-full px-6 pb-24 pt-32 sm:px-8 md:pb-32 md:pt-40 lg:px-12"
       style={surfaceStyle}
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      variants={sectionMotion}
+      initial="hidden"
+      whileInView="visible"
       viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
     >
       <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-8 md:grid-cols-12">
         <div className="flex flex-col md:col-span-7">
-          <motion.div
-            className="flex flex-wrap items-center gap-2"
-            variants={childMotion}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.05, ease: "easeOut" }}
-          >
+          <motion.div className="flex flex-wrap items-center gap-2" variants={childMotion}>
             <span
               className="rounded-full border px-3 py-2 font-[family-name:var(--font-body)] text-xs font-medium leading-tight"
               style={panelStyle}
@@ -214,10 +214,6 @@ export default function Hero() {
             className="mt-6 max-w-4xl font-[family-name:var(--font-display)] text-4xl font-semibold leading-none tracking-tight md:text-5xl"
             style={{ color: "var(--color-text)" }}
             variants={childMotion}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            transition={{ duration: 0.55, delay: 0.15, ease: "easeOut" }}
           >
             Book a background-checked walker in 30 seconds. Get live GPS and photos.
           </motion.h1>
@@ -226,10 +222,6 @@ export default function Hero() {
             className="mt-5 max-w-2xl font-[family-name:var(--font-body)] text-lg font-medium leading-relaxed"
             style={{ color: "var(--color-text)" }}
             variants={childMotion}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            transition={{ duration: 0.55, delay: 0.25, ease: "easeOut" }}
           >
             Fast bookings, consistent walkers, real-time updates so you can focus on the rest of your day.
           </motion.p>
@@ -238,22 +230,11 @@ export default function Hero() {
             className="mt-3 max-w-2xl font-[family-name:var(--font-body)] text-sm leading-relaxed"
             style={mutedStyle}
             variants={childMotion}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            transition={{ duration: 0.55, delay: 0.3, ease: "easeOut" }}
           >
             Starting around $15–$35 per walk (typical range; exact price varies by ZIP and walk length).
           </motion.p>
 
-          <motion.div
-            className="mt-8 flex flex-col gap-3"
-            variants={childMotion}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            transition={{ duration: 0.55, delay: 0.35, ease: "easeOut" }}
-          >
+          <motion.div className="mt-8 flex flex-col gap-3" variants={childMotion}>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <button
                 type="button"
@@ -279,15 +260,7 @@ export default function Hero() {
             </p>
           </motion.div>
 
-          <motion.div
-            className="mt-8 rounded-3xl border p-4 sm:p-5"
-            style={panelStyle}
-            variants={childMotion}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            transition={{ duration: 0.55, delay: 0.4, ease: "easeOut" }}
-          >
+          <motion.div className="mt-8 rounded-3xl border p-4 sm:p-5" style={panelStyle} variants={childMotion}>
             <form className="flex flex-col gap-3" onSubmit={handleZipSubmit} noValidate>
               <label
                 htmlFor="hero-zip"
@@ -518,13 +491,7 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        <motion.div
-          className="md:col-span-5"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-        >
+        <motion.div className="md:col-span-5" variants={childMotion}>
           <div className="rounded-3xl border p-2" style={panelStyle}>
             <ProjectImage id="hero" className="w-full h-auto object-cover rounded-xl" />
           </div>
