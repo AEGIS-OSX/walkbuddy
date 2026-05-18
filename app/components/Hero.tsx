@@ -313,7 +313,7 @@ export default function Hero() {
               ) : null}
             </form>
 
-            <div className="mt-4" role="status" aria-live="polite" aria-atomic="true">
+            <div className="mt-4" role="status" aria-live="polite" aria-atomic="true" aria-busy={availabilityState === "loading"}>
               {availabilityState === "loading" ? (
                 <div className="rounded-2xl border p-4" style={panelStyle}>
                   <motion.div
