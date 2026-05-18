@@ -1,31 +1,31 @@
 {
   "hero": {
-    "url": "",
-    "alt": "",
+    "url": "https://zkvkbpxrxnfynqqeytke.supabase.co/storage/v1/object/public/marketing-assets/walkbuddy/cleo/1779136254788-hero.png",
+    "alt": "Hero image: candid morning neighborhood shot with a walker and on-leash dog framed left, negative space on the right reserved for the inline ZIP check and a phone mockup. Palette uses #FFDD57 for the ",
     "width": 1920,
     "height": 1080
   },
   "feature_1": {
-    "url": "",
-    "alt": "",
+    "url": "https://zkvkbpxrxnfynqqeytke.supabase.co/storage/v1/object/public/marketing-assets/walkbuddy/cleo/1779136375751-feature_1.png",
+    "alt": "Feature 1 image: close medium candid of a walker kneeling to clip a leash with a visible trust badge using #FFDD57 and a soft green ribbon. Emphasizes verified walkers and tactile neighborhood texture",
     "width": 800,
     "height": 600
   },
   "feature_2": {
-    "url": "",
-    "alt": "",
+    "url": "https://zkvkbpxrxnfynqqeytke.supabase.co/storage/v1/object/public/marketing-assets/walkbuddy/cleo/1779136496772-feature_2.png",
+    "alt": "Feature 2 image: high-angle close shot of a smartphone in a walker’s hand showing live map pin, ETA timeline, and a served chip in #8FD19E with CTA accents in #FFDD57. Supports the \"Real-time updates\"",
     "width": 800,
     "height": 600
   },
   "feature_3": {
-    "url": "",
-    "alt": "",
+    "url": "https://zkvkbpxrxnfynqqeytke.supabase.co/storage/v1/object/public/marketing-assets/walkbuddy/cleo/1779136619889-feature_3.png",
+    "alt": "Feature 3 image: portrait-style candid of a walker handing a schedule card to a dog owner on a porch, with a subtle #FFDD57 accent and #8FD19E checkmark to signal recurring service. Reinforces continu",
     "width": 800,
     "height": 600
   },
   "social_proof": {
-    "url": "",
-    "alt": "",
+    "url": "https://zkvkbpxrxnfynqqeytke.supabase.co/storage/v1/object/public/marketing-assets/walkbuddy/cleo/1779136197327-social_proof.png",
+    "alt": "Social proof: Two candid, diverse user portraits with dogs on a stoop, warm backlight and negative space for testimonial copy and verification microcopy. Prompt summary: 50mm f/2.0, warm 5600K, Kodak ",
     "width": 1200,
     "height": 800
   }
