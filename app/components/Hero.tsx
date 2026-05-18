@@ -193,7 +193,7 @@ export default function Hero() {
       viewport={{ once: true, margin: "-100px" }}
     >
       <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-8 md:grid-cols-12">
-        <div className="flex flex-col md:col-span-7">
+        <motion.div className="flex flex-col md:col-span-7" variants={sectionMotion}>
           <motion.div className="flex flex-wrap items-center gap-2" variants={childMotion}>
             <span
               className="rounded-full border px-3 py-2 font-[family-name:var(--font-body)] text-xs font-medium leading-tight"
@@ -277,7 +277,7 @@ export default function Hero() {
                   type="text"
                   inputMode="numeric"
                   autoComplete="postal-code"
-                  pattern="[0-9]{5}"
+                  pattern="^\d{5}$"
                   maxLength={5}
                   value={zip}
                   onChange={handleZipChange}
@@ -454,7 +454,7 @@ export default function Hero() {
                         type="text"
                         inputMode="numeric"
                         autoComplete="postal-code"
-                        pattern="[0-9]{5}"
+                        pattern="^\d{5}$"
                         maxLength={5}
                         value={waitlistFields.zip}
                         onChange={handleWaitlistChange("zip")}
@@ -489,7 +489,7 @@ export default function Hero() {
               </motion.form>
             ) : null}
           </motion.div>
-        </div>
+        </motion.div>
 
         <motion.div className="md:col-span-5" variants={childMotion}>
           <div className="rounded-3xl border p-2" style={panelStyle}>
