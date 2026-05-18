@@ -38,7 +38,8 @@ export default function Testimonials() {
     <motion.section
       id="testimonials"
       aria-labelledby="testimonials-title"
-      className="bg-[var(--color-bg)] px-6 py-24 text-[var(--color-text)] sm:px-8 md:py-32 lg:px-12"
+      className="px-6 py-24 sm:px-8 md:py-32 lg:px-12"
+      style={{ backgroundColor: "var(--color-bg)", color: "var(--color-text)" }}
       variants={sectionVariants}
       initial="hidden"
       whileInView="visible"
@@ -47,12 +48,15 @@ export default function Testimonials() {
       <div className="mx-auto grid w-full max-w-6xl gap-10 md:grid-cols-[minmax(0,1.05fr)_minmax(18rem,0.95fr)] md:items-center lg:gap-16">
         <div className="flex flex-col gap-8">
           <motion.div className="flex max-w-2xl flex-col gap-4" variants={itemVariants}>
-            <p className="font-[family-name:var(--font-body)] text-sm font-medium uppercase leading-tight tracking-[0.12em] text-[var(--color-muted)]">
+            <p
+              className="font-[family-name:var(--font-body)] text-sm font-medium uppercase leading-tight tracking-[0.12em]"
+              style={{ color: "var(--color-muted)" }}
+            >
               Local proof
             </p>
             <h2
               id="testimonials-title"
-              className="font-[family-name:var(--font-display)] text-[1.75rem] font-semibold leading-[1.06] tracking-[-0.03em] text-[var(--color-text)] md:text-[2.125rem]"
+              className="font-[family-name:var(--font-display)] text-[1.75rem] font-semibold leading-[1.06] tracking-[-0.03em] md:text-[2.125rem]"
             >
               What people say
             </h2>
@@ -62,11 +66,19 @@ export default function Testimonials() {
             {testimonials.map((testimonial: string) => (
               <motion.article
                 key={testimonial}
-                className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg)] p-5 shadow-[0_1px_6px_var(--color-border)] sm:p-6 md:p-7"
+                className="rounded-[var(--radius-lg)] border p-5 sm:p-6 md:p-7"
+                style={{
+                  borderColor: "var(--color-border)",
+                  backgroundColor: "var(--color.bg.card)",
+                  boxShadow: "0 1px 6px var(--color-border)",
+                }}
                 variants={itemVariants}
               >
-                <blockquote className="font-[family-name:var(--font-body)] text-lg font-medium leading-[1.45] tracking-[-0.01em] text-[var(--color-text)] md:text-xl">
-                  <p className="text-[var(--color-text)]">{testimonial}</p>
+                <blockquote
+                  className="font-[family-name:var(--font-body)] text-lg font-medium leading-[1.45] tracking-[-0.01em] md:text-xl"
+                  style={{ color: "var(--color-text)" }}
+                >
+                  <p>{testimonial}</p>
                 </blockquote>
               </motion.article>
             ))}
@@ -74,7 +86,12 @@ export default function Testimonials() {
         </div>
 
         <motion.aside
-          className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg)] p-3 shadow-[0_1px_6px_var(--color-border)]"
+          className="overflow-hidden rounded-[var(--radius-lg)] border p-3"
+          style={{
+            borderColor: "var(--color-border)",
+            backgroundColor: "var(--color-bg)",
+            boxShadow: "0 1px 6px var(--color-border)",
+          }}
           aria-label="WalkBuddy customer and walker proof"
           variants={itemVariants}
         >
