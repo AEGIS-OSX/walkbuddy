@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+# Staging preview: allow QA crawling and scanners. Production robots can be tightened separately.

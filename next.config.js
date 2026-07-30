@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  // Use SSR (no static export) so crawlers and QA agents see real HTML
   images: { unoptimized: true },
 };
 
