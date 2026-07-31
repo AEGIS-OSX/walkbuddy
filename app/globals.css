@@ -5,22 +5,28 @@
 @tailwind utilities;
 
 :root {
-  --color-primary: #8FD19E;
-  --color-accent: #FFDD57;
-  --color-bg: #F5EDE2;
-  --color-text: #1C1C1A;
-  --color-muted: #5C5C58;
-  --color-border: #FFDD57;
+  --font-display: "Aeonik", sans-serif;
+  --font-body: "Aeonik", "Instrument Sans", system-ui, sans-serif;
+
+  --color-text: #1A1A1A;
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #4A4A4A;
+  --color-muted: #6B6B6B;
+  --color-bg-surface: #FFFFFF;
+  --color-accent-primary: #2D6A4F;
+  --color-accent-primary-hover: #1B4332;
+  --color-border: #E0E0E0;
+  --color-success: #2D6A4F;
+  --color-error: #C0392B;
+
   --space-base: 8px;
   --radius-sm: 4px;
   --radius-md: 8px;
-  --radius-lg: 16px;
-  --font-display: 'Reckless Neue', Georgia, serif;
-  --font-body: 'Aeonik', system-ui, -apple-system, sans-serif;
+  --radius-lg: 12px;
 }
 
 html, body {
-  background: var(--color-bg);
+  background: var(--color-bg-surface);
   color: var(--color-text);
   font-family: var(--font-body);
 }
