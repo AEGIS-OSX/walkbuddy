@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, type Variants } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import type { CSSProperties, ChangeEvent, FormEvent } from "react";
 import { useMemo, useRef, useState } from "react";
 import { ProjectImage } from "@/app/components/ProjectImage";
@@ -80,28 +80,7 @@ const bodyTextStyle: CSSProperties = {
     'var(--font-body)',
 };
 
-const sectionMotion: Variants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: "easeOut",
-      staggerChildren: 0.08,
-      delayChildren: 0.05,
-    },
-  },
-};
 
-const childMotion: Variants = {
-  hidden: { opacity: 0, y: 18 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.55, ease: "easeOut" },
-  },
-};
 
 function formatTodayTime(time: string): string {
   return `Today ${time}`;
@@ -126,6 +105,30 @@ export default function Hero() {
   const [waitlistError, setWaitlistError] = useState("");
   const [waitlistSubmitting, setWaitlistSubmitting] = useState(false);
   const [waitlistSuccess, setWaitlistSuccess] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
+
+  const sectionMotion: Variants = useMemo(() => ({
+    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 40 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: shouldReduceMotion ? 0 : 0.6,
+        ease: "easeOut",
+        staggerChildren: shouldReduceMotion ? 0 : 0.08,
+        delayChildren: shouldReduceMotion ? 0 : 0.05,
+      },
+    },
+  }), [shouldReduceMotion]);
+
+  const childMotion: Variants = useMemo(() => ({
+    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 18 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: shouldReduceMotion ? 0 : 0.55, ease: "easeOut" },
+    },
+  }), [shouldReduceMotion]);
 
   const nextTimes = useMemo((): string[] => [formatTodayTime("5:30 PM"), formatTodayTime("7:00 PM")], []);
 
@@ -350,9 +353,9 @@ export default function Hero() {
                     <motion.div
                       className="h-full w-1/3 rounded-full"
                       style={shimmerStyle}
-                      initial={{ x: "-120%", opacity: 0.45 }}
-                      animate={{ x: "320%", opacity: [0.45, 0.85, 0.45] }}
-                      transition={{ duration: 1.1, repeat: Infinity, ease: "easeOut" }}
+                      initial={{ x: shouldReduceMotion ? 0 : "-120%", opacity: shouldReduceMotion ? 1 : 0.45 }}
+                      animate={shouldReduceMotion ? {} : { x: "320%", opacity: [0.45, 0.85, 0.45] }}
+                      transition={shouldReduceMotion ? { duration: 0 } : { duration: 1.1, repeat: Infinity, ease: "easeOut" }}
                     />
                   </div>
                   <p className="mt-3 text-sm leading-relaxed" style={{ ...bodyTextStyle, ...mutedStyle }}>
@@ -411,9 +414,9 @@ export default function Hero() {
                 className="mt-4 rounded-2xl border p-4"
                 style={panelStyle}
                 onSubmit={handleWaitlistSubmit}
-                initial={{ opacity: 0, y: 12 }}
+                initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.24, ease: "easeOut" }}
+                transition={{ duration: shouldReduceMotion ? 0 : 0.24, ease: "easeOut" }}
                 noValidate
               >
                 <h2 className="text-xl font-semibold leading-tight" style={{ ...displayTextStyle, color: token("color.neutral.900", "#2F2F2F") }}>
