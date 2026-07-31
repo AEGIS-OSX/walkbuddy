@@ -72,12 +72,12 @@ const shimmerStyle: CSSProperties = {
 
 const displayTextStyle: CSSProperties = {
   fontFamily:
-    'var(--type.family.display, "Rubik", "Domaine Alternate", system-ui, -apple-system, "Segoe UI", Arial, sans-serif)',
+    'var(--font-display)',
 };
 
 const bodyTextStyle: CSSProperties = {
   fontFamily:
-    'var(--type.family.body, "Source Sans 3", system-ui, -apple-system, "Segoe UI", Arial, sans-serif)',
+    'var(--font-body)',
 };
 
 const sectionMotion: Variants = {
