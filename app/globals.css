@@ -3,19 +3,25 @@
 @tailwind utilities;
 
 :root {
-  /* Design System v1.3 — approved and locked */
+  /* Design System v1.6 — approved and locked */
   --color-cta: #E8622A;
   --color-success: #A8C5A0;
   --color-bg: #FAF6F0;
-  --color-text: #1C1C1A;
+  --color-text: #1A1A1A;
+  --color-muted: #6B6B6B;
   --color-surface: #E8D9C4;
-  --color-muted: #6B6560;
-  --font-display: 'Reckless Neue', serif;
-  --font-body: 'Aeonik', sans-serif;
+  --color-surface-dark: #1A1A1A;
+  --font-display: "Aeonik", sans-serif;
+  --font-body: "Aeonik", "Instrument Sans", system-ui, sans-serif;
+
+  /* Motion tokens */
+  --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-fast: 150ms;
+  --motion-base: 300ms;
 
   /* Component-compat aliases */
   --color-accent: #E8622A;
-  --color-text-primary: #1C1C1A;
+  --color-text-primary: #1A1A1A;
   --color-text-secondary: #4A4A4A;
   --color-bg-surface: #FAF6F0;
   --color-bg-card: #E8D9C4;
