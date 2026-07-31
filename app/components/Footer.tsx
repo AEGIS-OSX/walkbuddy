@@ -1,18 +1,6 @@
 "use client";
 
-import { motion, type Variants } from "framer-motion";
-
-const footerVariants: Variants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: "easeOut",
-    },
-  },
-};
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 
 const footerLinks: ReadonlyArray<{ href: string; label: string }> = [
   { href: "/privacy", label: "Privacy Policy" },
@@ -22,6 +10,19 @@ const footerLinks: ReadonlyArray<{ href: string; label: string }> = [
 ];
 
 export default function Footer(): JSX.Element {
+  const prefersReducedMotion = useReducedMotion();
+
+  const footerVariants: Variants = {
+    hidden: { opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 16 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: prefersReducedMotion ? 0 : 0.6,
+        ease: "easeOut",
+      },
+    },
+  };
   return (
     <motion.footer
       id="footer"
