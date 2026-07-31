@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, type Variants } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion, type Variants } from "framer-motion";
 import type { CSSProperties, ChangeEvent, FormEvent } from "react";
 import { useMemo, useRef, useState } from "react";
 import { ProjectImage } from "@/app/components/ProjectImage";
@@ -80,29 +80,6 @@ const bodyTextStyle: CSSProperties = {
     'var(--font-body)',
 };
 
-const sectionMotion: Variants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: "easeOut",
-      staggerChildren: 0.08,
-      delayChildren: 0.05,
-    },
-  },
-};
-
-const childMotion: Variants = {
-  hidden: { opacity: 0, y: 18 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.55, ease: "easeOut" },
-  },
-};
-
 function formatTodayTime(time: string): string {
   return `Today ${time}`;
 }
@@ -126,6 +103,31 @@ export default function Hero() {
   const [waitlistError, setWaitlistError] = useState("");
   const [waitlistSubmitting, setWaitlistSubmitting] = useState(false);
   const [waitlistSuccess, setWaitlistSuccess] = useState(false);
+
+  const shouldReduceMotion = useReducedMotion();
+
+  const sectionMotion: Variants = {
+    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 40 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: shouldReduceMotion ? 0 : 0.6,
+        ease: "easeOut",
+        staggerChildren: shouldReduceMotion ? 0 : 0.08,
+        delayChildren: shouldReduceMotion ? 0 : 0.05,
+      },
+    },
+  };
+
+  const childMotion: Variants = {
+    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 18 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: shouldReduceMotion ? 0 : 0.55, ease: "easeOut" },
+    },
+  };
 
   const nextTimes = useMemo((): string[] => [formatTodayTime("5:30 PM"), formatTodayTime("7:00 PM")], []);
 
@@ -347,13 +349,17 @@ export default function Hero() {
               {availabilityState === "loading" ? (
                 <div className="rounded-2xl border p-4" style={chipStyle}>
                   <div className="h-3 w-3/4 overflow-hidden rounded-full border" style={subtleBarStyle} aria-hidden="true">
-                    <motion.div
-                      className="h-full w-1/3 rounded-full"
-                      style={shimmerStyle}
-                      initial={{ x: "-120%", opacity: 0.45 }}
-                      animate={{ x: "320%", opacity: [0.45, 0.85, 0.45] }}
-                      transition={{ duration: 1.1, repeat: Infinity, ease: "easeOut" }}
-                    />
+                    {shouldReduceMotion ? (
+                      <div className="h-full w-1/3 rounded-full" style={shimmerStyle} />
+                    ) : (
+                      <motion.div
+                        className="h-full w-1/3 rounded-full"
+                        style={shimmerStyle}
+                        initial={{ x: "-120%", opacity: 0.45 }}
+                        animate={{ x: "320%", opacity: [0.45, 0.85, 0.45] }}
+                        transition={{ duration: 1.1, repeat: Infinity, ease: "easeOut" }}
+                      />
+                    )}
                   </div>
                   <p className="mt-3 text-sm leading-relaxed" style={{ ...bodyTextStyle, ...mutedStyle }}>
                     Checking coverage for {checkedZip}.
@@ -400,7 +406,7 @@ export default function Hero() {
                     Join the waitlist
                   </button>
                   <p className="mt-3 text-xs leading-relaxed" style={{ ...bodyTextStyle, ...mutedStyle }}>
-                    We’ll only use your contact to tell you when WalkBuddy is available in your neighborhood.
+                    We'll only use your contact to tell you when WalkBuddy is available in your neighborhood.
                   </p>
                 </div>
               ) : null}
@@ -411,9 +417,9 @@ export default function Hero() {
                 className="mt-4 rounded-2xl border p-4"
                 style={panelStyle}
                 onSubmit={handleWaitlistSubmit}
-                initial={{ opacity: 0, y: 12 }}
+                initial={{ opacity: shouldReduceMotion ? 1 : 0, y: shouldReduceMotion ? 0 : 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.24, ease: "easeOut" }}
+                transition={{ duration: shouldReduceMotion ? 0 : 0.24, ease: "easeOut" }}
                 noValidate
               >
                 <h2 className="text-xl font-semibold leading-tight" style={{ ...displayTextStyle, color: token("color.neutral.900", "#2F2F2F") }}>
@@ -422,7 +428,7 @@ export default function Hero() {
 
                 {waitlistSuccess ? (
                   <p className="mt-4 rounded-2xl border px-4 py-3 text-sm font-medium leading-relaxed" style={{ ...successChipStyle, ...bodyTextStyle }} role="status" aria-live="polite">
-                    Thanks. You’re on the list. We’ll email when WalkBuddy arrives in your ZIP. No spam. Unsubscribe anytime.
+                    Thanks. You're on the list. We'll email when WalkBuddy arrives in your ZIP. No spam. Unsubscribe anytime.
                   </p>
                 ) : (
                   <div className="mt-4 grid gap-3">
