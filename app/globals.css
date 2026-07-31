@@ -3,22 +3,26 @@
 @tailwind utilities;
 
 :root {
-  --font-display: "Aeonik", sans-serif;
-  --font-body: "Aeonik", "Instrument Sans", system-ui, sans-serif;
-
-  --color-text: #1A1A1A;
-  --color-text-primary: #1A1A1A;
-  --color-text-secondary: #4A4A4A;
-  --color-muted: #6B6B6B;
+  /* Design System v1.3 — approved and locked */
+  --color-cta: #E8622A;
+  --color-success: #A8C5A0;
   --color-bg: #FAF6F0;
-  --color-bg-surface: #FFFFFF;
+  --color-text: #1C1C1A;
+  --color-surface: #E8D9C4;
+  --color-muted: #6B6560;
+  --font-display: 'Reckless Neue', serif;
+  --font-body: 'Aeonik', sans-serif;
+
+  /* Component-compat aliases */
   --color-accent: #E8622A;
-  --color-accent-primary: #2D6A4F;
-  --color-accent-primary-hover: #1B4332;
-  --color-border: #E0E0E0;
-  --color-success: #2D6A4F;
+  --color-text-primary: #1C1C1A;
+  --color-text-secondary: #4A4A4A;
+  --color-bg-surface: #FAF6F0;
+  --color-bg-card: #E8D9C4;
+  --color-border: #D4C9B6;
   --color-error: #C0392B;
 
+  /* Spacing and radii */
   --space-base: 8px;
   --radius-sm: 4px;
   --radius-md: 8px;
