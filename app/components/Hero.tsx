@@ -1,524 +1,96 @@
-"use client";
+'use client';
 
-import { motion, useReducedMotion, type Variants } from "framer-motion";
-import type { CSSProperties, ChangeEvent, FormEvent } from "react";
-import { useMemo, useRef, useState } from "react";
-import { ProjectImage } from "@/app/components/ProjectImage";
+import { useState, useCallback } from 'react';
+import Link from 'next/link';
+import { motion, useReducedMotion } from 'framer-motion';
+import { ProjectImage } from './ProjectImage';
 
-type AvailabilityState = "idle" | "loading" | "served" | "not-served";
-type AvailabilityResult = "served" | "not-served";
-
-type WaitlistFields = {
-  email: string;
-  name: string;
-  zip: string;
-};
-
-const servedPrefixes = ["100", "112", "606", "941"];
-const zipPattern = /^\d{5}$/;
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-const token = (name: string, fallback: string): string => `var(--${name}, ${fallback})`;
-
-const surfaceStyle: CSSProperties = {
-  backgroundColor: token("color.bg.surface", "#FFFFFF"),
-  color: token("color.neutral.900", "#2F2F2F"),
-};
-
-const panelStyle: CSSProperties = {
-  backgroundColor: token("color.bg.card", "#F5EDE2"),
-  borderColor: token("color.border", "rgba(47,47,47,0.06)"),
-  color: token("color.neutral.900", "#2F2F2F"),
-};
-
-const fieldStyle: CSSProperties = {
-  backgroundColor: token("color.bg.field", "#E7E1D6"),
-  borderColor: token("color.border", "rgba(47,47,47,0.06)"),
-  color: token("color.neutral.900", "#2F2F2F"),
-  outlineColor: token("color.focus", "#FFDD57"),
-};
-
-const chipStyle: CSSProperties = {
-  backgroundColor: token("color.bg.surface", "#FFFFFF"),
-  borderColor: token("color.border", "rgba(47,47,47,0.06)"),
-  color: token("color.neutral.900", "#2F2F2F"),
-};
-
-const mutedStyle: CSSProperties = {
-  color: token("color.neutral.700", "rgba(47,47,47,0.70)"),
-};
-
-const accentButtonStyle: CSSProperties = {
-  backgroundColor: token("color.brand.accent", "#FFDD57"),
-  borderColor: token("color.brand.accent", "#FFDD57"),
-  color: token("color.neutral.900", "#2F2F2F"),
-  outlineColor: token("color.focus", "#FFDD57"),
-};
-
-const successChipStyle: CSSProperties = {
-  backgroundColor: token("color.success", "#8FD19E"),
-  borderColor: token("color.success", "#8FD19E"),
-  color: token("color.neutral.900", "#2F2F2F"),
-};
-
-const subtleBarStyle: CSSProperties = {
-  backgroundColor: token("color.bg.field", "#E7E1D6"),
-  borderColor: token("color.border", "rgba(47,47,47,0.06)"),
-};
-
-const shimmerStyle: CSSProperties = {
-  backgroundColor: token("color.brand.accent", "#FFDD57"),
-};
-
-const displayTextStyle: CSSProperties = {
-  fontFamily:
-    'var(--font-display)',
-};
-
-const bodyTextStyle: CSSProperties = {
-  fontFamily:
-    'var(--font-body)',
-};
-
-
-
-function formatTodayTime(time: string): string {
-  return `Today ${time}`;
-}
-
-function getAvailabilityResult(zip: string): AvailabilityResult {
-  return servedPrefixes.some((prefix: string) => zip.startsWith(prefix)) ? "served" : "not-served";
-}
+type UiState = 'idle' | 'loading' | 'served' | 'not_served' | 'error';
 
 export default function Hero() {
-  const zipInputRef = useRef<HTMLInputElement | null>(null);
-  const [zip, setZip] = useState("");
-  const [zipError, setZipError] = useState("");
-  const [availabilityState, setAvailabilityState] = useState<AvailabilityState>("idle");
-  const [checkedZip, setCheckedZip] = useState("");
-  const [showWaitlist, setShowWaitlist] = useState(false);
-  const [waitlistFields, setWaitlistFields] = useState<WaitlistFields>({
-    email: "",
-    name: "",
-    zip: "",
-  });
-  const [waitlistError, setWaitlistError] = useState("");
-  const [waitlistSubmitting, setWaitlistSubmitting] = useState(false);
-  const [waitlistSuccess, setWaitlistSuccess] = useState(false);
+  const [zipValue, setZipValue] = useState('');
+  const [uiState, setUiState] = useState<UiState>('idle');
+  const [hasError, setHasError] = useState(false);
   const shouldReduceMotion = useReducedMotion();
 
-  const sectionMotion: Variants = useMemo(() => ({
-    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 40 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: shouldReduceMotion ? 0 : 0.6,
-        ease: "easeOut",
-        staggerChildren: shouldReduceMotion ? 0 : 0.08,
-        delayChildren: shouldReduceMotion ? 0 : 0.05,
-      },
-    },
-  }), [shouldReduceMotion]);
+  const validateZip = useCallback((zip: string): boolean => {
+    return /^\d{5}$/.test(zip);
+  }, []);
 
-  const childMotion: Variants = useMemo(() => ({
-    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 18 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: shouldReduceMotion ? 0 : 0.55, ease: "easeOut" },
-    },
-  }), [shouldReduceMotion]);
+  const handleZipChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, '').slice(0, 5);
+    setZipValue(value);
+    if (hasError) { setHasError(false); setUiState('idle'); }
+  }, [hasError]);
 
-  const nextTimes = useMemo((): string[] => [formatTodayTime("5:30 PM"), formatTodayTime("7:00 PM")], []);
+  const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setHasError(false);
+    if (!validateZip(zipValue)) { setUiState('error'); setHasError(true); return; }
+    setUiState('loading');
+    setTimeout(() => { setUiState(zipValue.startsWith('9') ? 'served' : 'not_served'); }, 600);
+  }, [zipValue, validateZip]);
 
-  const availabilityAnnouncement = useMemo((): string => {
-    if (availabilityState === "loading") {
-      return checkedZip ? `Checking coverage for ${checkedZip}.` : "Checking coverage.";
-    }
-
-    if (availabilityState === "served") {
-      return `Served. Next available: ${nextTimes[0]}. Example times: ${nextTimes.join(" and ")}.`;
-    }
-
-    if (availabilityState === "not-served") {
-      return "Not served yet in your ZIP. Join the waitlist to be notified when we launch near you.";
-    }
-
-    return "";
-  }, [availabilityState, checkedZip, nextTimes]);
-
-  const runZipCheck = (zipToCheck: string): void => {
-    const trimmedZip = zipToCheck.trim();
-
-    if (!zipPattern.test(trimmedZip)) {
-      setZipError("Enter a 5-digit ZIP code.");
-      setAvailabilityState("idle");
-      return;
-    }
-
-    setZipError("");
-    setCheckedZip(trimmedZip);
-    setShowWaitlist(false);
-    setWaitlistSuccess(false);
-    setAvailabilityState("loading");
-
-    window.setTimeout(() => {
-      const result = getAvailabilityResult(trimmedZip);
-      setAvailabilityState(result);
-      setWaitlistFields((currentFields: WaitlistFields) => ({
-        ...currentFields,
-        zip: trimmedZip,
-      }));
-      window.dispatchEvent(new CustomEvent("zip_check", { detail: { zip: trimmedZip, result } }));
-    }, 420);
-  };
-
-  const handleHeroCtaClick = (): void => {
-    window.dispatchEvent(new CustomEvent("hero_cta_click"));
-
-    if (zipPattern.test(zip.trim())) {
-      runZipCheck(zip);
-      return;
-    }
-
-    zipInputRef.current?.focus();
-  };
-
-  const handleZipChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const nextZip = event.target.value.replace(/\D/g, "").slice(0, 5);
-    setZip(nextZip);
-
-    if (zipError && zipPattern.test(nextZip)) {
-      setZipError("");
-    }
-  };
-
-  const handleZipSubmit = (event: FormEvent<HTMLFormElement>): void => {
-    event.preventDefault();
-    runZipCheck(zip);
-  };
-
-  const handleWaitlistChange = (field: keyof WaitlistFields) => (event: ChangeEvent<HTMLInputElement>): void => {
-    setWaitlistFields((currentFields: WaitlistFields) => ({
-      ...currentFields,
-      [field]: field === "zip" ? event.target.value.replace(/\D/g, "").slice(0, 5) : event.target.value,
-    }));
-
-    if (field === "email" && waitlistError) {
-      setWaitlistError("");
-    }
-  };
-
-  const handleWaitlistSubmit = (event: FormEvent<HTMLFormElement>): void => {
-    event.preventDefault();
-
-    if (!emailPattern.test(waitlistFields.email.trim())) {
-      setWaitlistError("Please enter a valid email address.");
-      setWaitlistSuccess(false);
-      return;
-    }
-
-    setWaitlistError("");
-    setWaitlistSubmitting(true);
-
-    window.setTimeout(() => {
-      setWaitlistSubmitting(false);
-      setWaitlistSuccess(true);
-      window.dispatchEvent(new CustomEvent("waitlist_submit"));
-    }, 360);
-  };
+  const sectionAnimation = shouldReduceMotion
+    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.5, ease: 'easeOut' } }
+    : { initial: { opacity: 0, y: 24 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.5, ease: 'easeOut' } };
 
   return (
-    <motion.section
-      id="hero"
-      aria-labelledby="hero-title"
-      className="w-full px-6 pb-24 pt-32 sm:px-8 md:pb-32 md:pt-40 lg:px-12"
-      style={surfaceStyle}
-      variants={sectionMotion}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-100px" }}
-    >
-      <motion.div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-8 md:grid-cols-12" variants={sectionMotion}>
-        <motion.div className="flex flex-col md:col-span-7" variants={sectionMotion}>
-          <motion.div className="flex flex-wrap items-center gap-2" variants={childMotion}>
-            <span className="rounded-full border px-3 py-2 text-xs font-medium leading-tight" style={{ ...chipStyle, ...bodyTextStyle }}>
-              Background-checked walkers
-            </span>
-            <span className="rounded-full border px-3 py-2 text-xs font-medium leading-tight" style={{ ...chipStyle, ...bodyTextStyle }}>
-              Liability coverage for every walk
-            </span>
-          </motion.div>
-
-          <motion.h1
-            id="hero-title"
-            className="mt-6 max-w-4xl text-4xl font-semibold leading-none tracking-tight md:text-5xl"
-            style={{ ...displayTextStyle, color: token("color.neutral.900", "#2F2F2F") }}
-            variants={childMotion}
-          >
-            Book a background-checked walker in 30 seconds. Get live GPS and photos.
-          </motion.h1>
-
-          <motion.p
-            className="mt-5 max-w-2xl text-lg font-medium leading-relaxed"
-            style={{ ...bodyTextStyle, color: token("color.neutral.900", "#2F2F2F") }}
-            variants={childMotion}
-          >
-            Fast bookings, consistent walkers, real-time updates so you can focus on the rest of your day.
-          </motion.p>
-
-          <motion.p className="mt-3 max-w-2xl text-sm leading-relaxed" style={{ ...bodyTextStyle, ...mutedStyle }} variants={childMotion}>
-            Starting around $15–$35 per walk (typical range; exact price varies by ZIP and walk length).
-          </motion.p>
-
-          <motion.div className="mt-8 flex flex-col gap-3" variants={childMotion}>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <button
-                type="button"
-                onClick={handleHeroCtaClick}
-                className="min-h-11 rounded-full border px-5 py-3 text-sm font-semibold transition duration-200 ease-out hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                style={{ ...accentButtonStyle, ...bodyTextStyle }}
-              >
-                Check availability
-              </button>
-              <a
-                href="#how-it-works"
-                className="inline-flex min-h-11 items-center rounded-full px-1 py-3 text-sm font-semibold underline decoration-2 underline-offset-4 transition duration-200 ease-out hover:translate-x-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-                style={{ ...bodyTextStyle, color: token("color.neutral.900", "#2F2F2F"), outlineColor: token("color.focus", "#FFDD57") }}
-              >
-                How it works
-              </a>
-            </div>
-            <p className="text-sm leading-relaxed" style={{ ...bodyTextStyle, ...mutedStyle }}>
-              We check ZIP coverage instantly. No email required.
+    <motion.section aria-labelledby="hero-title" className="w-full" style={{ backgroundColor: 'var(--color-bg-surface)' }} {...sectionAnimation}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+          <div className="flex-1 w-full max-w-xl">
+            <h1 id="hero-title" className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6" style={{ color: 'var(--color-text-primary)', fontFamily: 'var(--font-display)' }}>
+              Book a background-checked walker in 30 seconds with live GPS and photos.
+            </h1>
+            <p className="text-lg sm:text-xl mb-8" style={{ color: 'var(--color-text-secondary)', fontFamily: 'var(--font-body)' }}>
+              Reliable local walkers and real-time updates so you can focus on your day while Milo gets his stretch.
             </p>
-            <p className="text-sm leading-relaxed" style={{ ...bodyTextStyle, ...mutedStyle }}>
-              We save your spot, not your card. Privacy-first, ZIP-aware invites.
-            </p>
-          </motion.div>
-
-          <motion.div className="mt-8 rounded-3xl border p-4 shadow-sm sm:p-5" style={panelStyle} variants={childMotion}>
-            <form className="flex flex-col gap-3" onSubmit={handleZipSubmit} noValidate>
-              <label htmlFor="hero-zip" className="text-sm font-medium leading-tight" style={{ ...bodyTextStyle, color: token("color.neutral.900", "#2F2F2F") }}>
-                Enter ZIP to see service in your area
-              </label>
-              <div className="flex gap-2">
-                <input
-                  ref={zipInputRef}
-                  id="hero-zip"
-                  name="zip"
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete="postal-code"
-                  pattern="^\d{5}$"
-                  maxLength={5}
-                  value={zip}
-                  onChange={handleZipChange}
-                  aria-invalid={Boolean(zipError)}
-                  aria-describedby={zipError ? "hero-zip-error" : "hero-zip-help"}
-                  placeholder="11201"
-                  disabled={availabilityState === "loading"}
-                  className="min-h-11 w-full rounded-full border px-4 py-3 text-base leading-tight outline-none transition duration-200 ease-out placeholder:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                  style={{ ...fieldStyle, ...bodyTextStyle, borderColor: zipError ? token("color.danger", "#7B1B2B") : fieldStyle.borderColor }}
-                />
-                <button
-                  type="submit"
-                  aria-label="Check ZIP availability"
-                  disabled={availabilityState === "loading" || zip.trim().length !== 5}
-                  className="min-h-11 min-w-11 rounded-full border px-4 py-3 text-base font-semibold transition duration-200 ease-out hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                  style={{ ...accentButtonStyle, ...bodyTextStyle }}
-                >
-                  →
+            <form onSubmit={handleSubmit} className="w-full max-w-md" noValidate>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1">
+                  <input type="text" inputMode="numeric" pattern="[0-9]{5}" maxLength={5} value={zipValue} onChange={handleZipChange}
+                    placeholder="Enter ZIP to see service in your area" aria-label="ZIP code"
+                    aria-describedby={hasError ? 'zip-error' : undefined} aria-invalid={hasError}
+                    disabled={uiState === 'loading'}
+                    className="w-full px-4 py-3 rounded-lg border text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50"
+                    style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-primary)', fontFamily: 'var(--font-body)' }} />
+                  {hasError && <span id="zip-error" role="alert" className="block mt-2 text-sm" style={{ color: 'var(--color-error)', fontFamily: 'var(--font-body)' }}>Please enter a valid 5-digit ZIP code</span>}
+                </div>
+                <button type="submit" disabled={uiState === 'loading'}
+                  className="px-6 py-3 rounded-lg font-semibold text-base whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-60"
+                  style={{ backgroundColor: 'var(--color-cta)', color: 'white', fontFamily: 'var(--font-body)' }}>
+                  {uiState === 'loading' ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Check availability
+                    </span>
+                  ) : 'Check availability'}
                 </button>
               </div>
-              <p id="hero-zip-help" className="text-xs leading-relaxed" style={{ ...bodyTextStyle, ...mutedStyle }}>
-                Served ZIP examples start with 100, 112, 606, or 941.
-              </p>
-              {zipError ? (
-                <p id="hero-zip-error" role="alert" className="text-sm font-medium leading-relaxed" style={{ ...bodyTextStyle, color: token("color.danger", "#7B1B2B") }}>
-                  {zipError}
-                </p>
-              ) : null}
             </form>
-
-            <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-              {availabilityAnnouncement}
-            </p>
-
-            <div className="mt-4" aria-busy={availabilityState === "loading"}>
-              {availabilityState === "loading" ? (
-                <div className="rounded-2xl border p-4" style={chipStyle}>
-                  <div className="h-3 w-3/4 overflow-hidden rounded-full border" style={subtleBarStyle} aria-hidden="true">
-                    <motion.div
-                      className="h-full w-1/3 rounded-full"
-                      style={shimmerStyle}
-                      initial={{ x: shouldReduceMotion ? 0 : "-120%", opacity: shouldReduceMotion ? 1 : 0.45 }}
-                      animate={shouldReduceMotion ? {} : { x: "320%", opacity: [0.45, 0.85, 0.45] }}
-                      transition={shouldReduceMotion ? { duration: 0 } : { duration: 1.1, repeat: Infinity, ease: "easeOut" }}
-                    />
-                  </div>
-                  <p className="mt-3 text-sm leading-relaxed" style={{ ...bodyTextStyle, ...mutedStyle }}>
-                    Checking coverage for {checkedZip}.
-                  </p>
-                </div>
-              ) : null}
-
-              {availabilityState === "served" ? (
-                <div className="rounded-2xl border p-4" style={chipStyle}>
-                  <span className="inline-flex rounded-full border px-3 py-2 text-xs font-semibold leading-tight" style={{ ...successChipStyle, ...bodyTextStyle }}>
-                    Served — Next available: {nextTimes[0]}
-                  </span>
-                  <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                    {nextTimes.map((time: string) => (
-                      <div key={time} className="rounded-2xl border px-4 py-3 text-sm font-medium" style={{ ...panelStyle, ...bodyTextStyle }}>
-                        {time}
-                      </div>
-                    ))}
-                  </div>
-                  <button
-                    type="button"
-                    className="mt-4 min-h-11 rounded-full border px-5 py-3 text-sm font-semibold transition duration-200 ease-out hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-                    style={{ ...accentButtonStyle, ...bodyTextStyle }}
-                  >
-                    Book next available
-                  </button>
-                </div>
-              ) : null}
-
-              {availabilityState === "not-served" ? (
-                <div className="rounded-2xl border p-4" style={chipStyle}>
-                  <p className="text-sm leading-relaxed" style={{ ...bodyTextStyle, color: token("color.neutral.900", "#2F2F2F") }}>
-                    Not served yet in your ZIP. Join the waitlist to be notified when we launch near you.
-                  </p>
-                  <p className="mt-2 text-sm leading-relaxed" style={{ ...bodyTextStyle, ...mutedStyle }}>
-                    Estimated launch: 2–4 weeks.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setShowWaitlist(true)}
-                    className="mt-4 min-h-11 rounded-full border px-5 py-3 text-sm font-semibold transition duration-200 ease-out hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-                    style={{ ...accentButtonStyle, ...bodyTextStyle }}
-                  >
-                    Join the waitlist
-                  </button>
-                  <p className="mt-3 text-xs leading-relaxed" style={{ ...bodyTextStyle, ...mutedStyle }}>
-                    We’ll only use your contact to tell you when WalkBuddy is available in your neighborhood.
-                  </p>
-                </div>
-              ) : null}
-            </div>
-
-            {availabilityState === "not-served" && showWaitlist ? (
-              <motion.form
-                className="mt-4 rounded-2xl border p-4"
-                style={panelStyle}
-                onSubmit={handleWaitlistSubmit}
-                initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: shouldReduceMotion ? 0 : 0.24, ease: "easeOut" }}
-                noValidate
-              >
-                <h2 className="text-xl font-semibold leading-tight" style={{ ...displayTextStyle, color: token("color.neutral.900", "#2F2F2F") }}>
-                  Join WalkBuddy early access
-                </h2>
-
-                {waitlistSuccess ? (
-                  <p className="mt-4 rounded-2xl border px-4 py-3 text-sm font-medium leading-relaxed" style={{ ...successChipStyle, ...bodyTextStyle }} role="status" aria-live="polite">
-                    Thanks. You’re on the list. We’ll email when WalkBuddy arrives in your ZIP. No spam. Unsubscribe anytime.
-                  </p>
-                ) : (
-                  <div className="mt-4 grid gap-3">
-                    <div className="grid gap-2">
-                      <label htmlFor="waitlist-email" className="text-sm font-medium leading-tight" style={{ ...bodyTextStyle, color: token("color.neutral.900", "#2F2F2F") }}>
-                        Email (required)
-                      </label>
-                      <input
-                        id="waitlist-email"
-                        name="email"
-                        type="email"
-                        autoComplete="email"
-                        value={waitlistFields.email}
-                        onChange={handleWaitlistChange("email")}
-                        aria-invalid={Boolean(waitlistError)}
-                        aria-describedby={waitlistError ? "waitlist-email-error" : undefined}
-                        className="min-h-11 rounded-full border px-4 py-3 text-base outline-none transition duration-200 ease-out placeholder:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                        style={{ ...fieldStyle, ...bodyTextStyle, borderColor: waitlistError ? token("color.danger", "#7B1B2B") : fieldStyle.borderColor }}
-                        disabled={waitlistSubmitting}
-                        required
-                      />
-                      {waitlistError ? (
-                        <p id="waitlist-email-error" role="alert" className="text-sm font-medium leading-relaxed" style={{ ...bodyTextStyle, color: token("color.danger", "#7B1B2B") }}>
-                          {waitlistError}
-                        </p>
-                      ) : null}
-                    </div>
-
-                    <div className="grid gap-2">
-                      <label htmlFor="waitlist-name" className="text-sm font-medium leading-tight" style={{ ...bodyTextStyle, color: token("color.neutral.900", "#2F2F2F") }}>
-                        Name (optional)
-                      </label>
-                      <input
-                        id="waitlist-name"
-                        name="name"
-                        type="text"
-                        autoComplete="name"
-                        value={waitlistFields.name}
-                        onChange={handleWaitlistChange("name")}
-                        className="min-h-11 rounded-full border px-4 py-3 text-base outline-none transition duration-200 ease-out placeholder:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                        style={{ ...fieldStyle, ...bodyTextStyle }}
-                        disabled={waitlistSubmitting}
-                      />
-                    </div>
-
-                    <div className="grid gap-2">
-                      <label htmlFor="waitlist-zip" className="text-sm font-medium leading-tight" style={{ ...bodyTextStyle, color: token("color.neutral.900", "#2F2F2F") }}>
-                        ZIP code (optional)
-                      </label>
-                      <input
-                        id="waitlist-zip"
-                        name="zip"
-                        type="text"
-                        inputMode="numeric"
-                        autoComplete="postal-code"
-                        pattern="^\d{5}$"
-                        maxLength={5}
-                        value={waitlistFields.zip}
-                        onChange={handleWaitlistChange("zip")}
-                        className="min-h-11 rounded-full border px-4 py-3 text-base outline-none transition duration-200 ease-out placeholder:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                        style={{ ...fieldStyle, ...bodyTextStyle }}
-                        disabled={waitlistSubmitting}
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      className="min-h-11 rounded-full border px-5 py-3 text-sm font-semibold transition duration-200 ease-out hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                      style={{ ...accentButtonStyle, ...bodyTextStyle }}
-                      disabled={waitlistSubmitting}
-                    >
-                      {waitlistSubmitting ? "Saving spot..." : "Save my spot"}
-                    </button>
-                  </div>
-                )}
-
-                <p className="mt-4 text-xs leading-relaxed" style={{ ...bodyTextStyle, ...mutedStyle }}>
-                  If we detect abuse, we may ask for a quick verification step.
-                </p>
-                <p className="mt-2 text-xs leading-relaxed" style={{ ...bodyTextStyle, ...mutedStyle }}>
-                  We save your spot, not your card. By joining you agree to our privacy policy.
-                </p>
-              </motion.form>
-            ) : null}
-          </motion.div>
-        </motion.div>
-
-        <motion.div className="md:col-span-5" variants={childMotion}>
-          <div className="rounded-3xl border p-2 shadow-sm" style={panelStyle}>
-            <ProjectImage id="hero" className="h-auto w-full rounded-xl object-cover" />
+            {uiState === 'served' && (
+              <div className="mt-6">
+                <p className="text-base font-medium mb-4" style={{ color: 'var(--color-success)', fontFamily: 'var(--font-body)' }}>Great news — walkers available in your area.</p>
+                <Link href="/book" role="button" className="inline-block px-6 py-3 rounded-lg font-semibold text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2" style={{ backgroundColor: 'var(--color-cta)', color: 'white', fontFamily: 'var(--font-body)' }}>Book next available</Link>
+              </div>
+            )}
+            {uiState === 'not_served' && (
+              <div className="mt-6">
+                <p className="text-base font-medium mb-4" style={{ color: 'var(--color-error)', fontFamily: 'var(--font-body)' }}>Not in your area yet. Join the waitlist.</p>
+                <Link href="/waitlist" role="button" className="inline-block px-6 py-3 rounded-lg font-semibold text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2" style={{ backgroundColor: 'var(--color-cta)', color: 'white', fontFamily: 'var(--font-body)' }}>Join waitlist</Link>
+                <p className="mt-3 text-sm" style={{ color: 'var(--color-text-secondary)', fontFamily: 'var(--font-body)' }}>We'll notify you when WalkBuddy launches near you.</p>
+              </div>
+            )}
           </div>
-        </motion.div>
-      </motion.div>
+          <div className="flex-1 w-full max-w-lg">
+            <ProjectImage id="hero" className="w-full h-auto rounded-lg" />
+          </div>
+        </div>
+      </div>
     </motion.section>
   );
 }
