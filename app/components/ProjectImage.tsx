@@ -14,6 +14,7 @@ export function ProjectImage({ id, className }: { id: AssetKey; className?: stri
       height={asset.height}
       className={className}
       loading={id === "hero" ? "eager" : "lazy"}
+      fetchPriority={id === "hero" ? "high" : undefined}
     />
   );
 }
